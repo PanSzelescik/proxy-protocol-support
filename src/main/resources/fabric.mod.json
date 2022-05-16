@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "proxy_protocol_support",
+  "version": "${version}",
+  "name": "Proxy Protocol Support",
+  "description": "Proxy Protocol support for Fabric servers",
+  "authors": [
+    "PanSzelescik"
+  ],
+  "contact": {
+    "website": "https://www.curseforge.com/minecraft/mc-mods/proxy-protocol-support",
+    "repo": "https://github.com/PanSzelescik/proxy-protocol-support",
+    "issues": "https://github.com/PanSzelescik/proxy-protocol-support/issues"
+  },
+  "license": "MIT",
+  "environment": "server",
+  "entrypoints": {
+    "server": [
+      "pl.panszelescik.proxy_protocol_support.fabric.ProxyProtocolInitializer"
+    ]
+  },
+  "mixins": [
+    "proxy_protocol_support.mixins.json"
+  ]
+}
