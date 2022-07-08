@@ -20,8 +20,8 @@ dependencies {
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    // https://mavenlibs.com/maven/dependency/io.netty/netty-codec-haproxy
     implementation group: 'io.netty', name: 'netty-codec-haproxy', version: '4.1.78.Final'
+    include group: 'io.netty', name: 'netty-codec-haproxy', version: '4.1.78.Final'
 }
 
 processResources {
