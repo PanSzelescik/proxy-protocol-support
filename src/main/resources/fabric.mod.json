@@ -3,12 +3,13 @@
   "id": "proxy_protocol_support",
   "version": "${version}",
   "name": "Proxy Protocol Support",
-  "description": "Proxy Protocol support for Fabric servers",
+  "description": "Proxy Protocol support for Fabric and Quilt servers",
   "authors": [
     "PanSzelescik"
   ],
   "contact": {
     "website": "https://www.curseforge.com/minecraft/mc-mods/proxy-protocol-support",
+    "homepage": "https://modrinth.com/mod/proxy-protocol-support",
     "repo": "https://github.com/PanSzelescik/proxy-protocol-support",
     "issues": "https://github.com/PanSzelescik/proxy-protocol-support/issues"
   },
