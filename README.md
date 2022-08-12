@@ -5,4 +5,4 @@ For example you can use [TCPShield](https://tcpshield.com/ "TCPShield") or other
 
 Server-Side mod only, on the client does nothing!
 
-Supports Minecraft versions 1.14-1.19 and probably snapshots (untested)
+Supports Minecraft versions 1.14-1.19.2 and probably snapshots (untested)
