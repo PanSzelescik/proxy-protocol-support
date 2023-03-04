@@ -20,40 +20,38 @@ public class ProxyProtocolSupport {
 
     public static final String MODID = "proxy_protocol_support";
 
-    public static Consumer<String> infoLogger = System.out::println;
-    public static Consumer<String> warnLogger = System.out::println;
-    public static Consumer<String> errorLogger = System.out::println;
+    public static Consumer<String> infoLogger;
+    public static Consumer<String> warnLogger;
+    public static Consumer<String> errorLogger;
 
     public static boolean enableProxyProtocol = false;
     public static Collection<CIDRMatcher> whitelistedIPs = new ArrayList<>();
 
     public static void initialize(Config config) throws IOException {
-        loggerInitialize();
-
         if (!config.enableProxyProtocol) {
-            ProxyProtocolSupport.infoLogger.accept("Proxy Protocol disabled!");
+            infoLogger.accept("Proxy Protocol disabled!");
             return;
         }
 
-        ProxyProtocolSupport.infoLogger.accept("Proxy Protocol enabled!");
+        infoLogger.accept("Proxy Protocol enabled!");
 
-        ProxyProtocolSupport.enableProxyProtocol = config.enableProxyProtocol;
-        ProxyProtocolSupport.whitelistedIPs = config.whitelistedIPs
+        enableProxyProtocol = config.enableProxyProtocol;
+        whitelistedIPs = config.whitelistedIPs
                 .stream()
                 .map(CIDRMatcher::new)
                 .collect(Collectors.toSet());
 
         if (config.whitelistTCPShieldServers) {
-            ProxyProtocolSupport.infoLogger.accept("TCPShield integration enabled!");
+            infoLogger.accept("TCPShield integration enabled!");
             whitelistedIPs = Stream
                     .concat(whitelistedIPs.stream(), TCPShieldIntegration.getWhitelistedIPs().stream())
                     .collect(Collectors.toSet());
         }
 
-        ProxyProtocolSupport.infoLogger.accept("Using " + ProxyProtocolSupport.whitelistedIPs.size() + " whitelisted IPs: " + ProxyProtocolSupport.whitelistedIPs);
+        infoLogger.accept("Using " + whitelistedIPs.size() + " whitelisted IPs: " + whitelistedIPs);
     }
 
-    private static void loggerInitialize() {
+    static {
         try {
             org.slf4j.Logger slf4j = org.slf4j.LoggerFactory.getLogger(MODID);
             infoLogger = slf4j::info;
