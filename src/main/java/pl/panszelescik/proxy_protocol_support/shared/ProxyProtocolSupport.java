@@ -7,6 +7,7 @@ import pl.panszelescik.proxy_protocol_support.shared.config.TCPShieldIntegration
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,6 +24,10 @@ public class ProxyProtocolSupport {
     public static Consumer<String> infoLogger = System.out::println;
     public static Consumer<String> warnLogger = System.out::println;
     public static Consumer<String> errorLogger = System.out::println;
+    public static BiConsumer<String, Exception> exceptionLogger = (s, e) -> {
+        errorLogger.accept(s);
+        e.printStackTrace();
+    };
 
     public static boolean enableProxyProtocol = false;
     public static Collection<CIDRMatcher> whitelistedIPs = new ArrayList<>();
@@ -59,16 +64,22 @@ public class ProxyProtocolSupport {
             infoLogger = slf4j::info;
             warnLogger = slf4j::warn;
             errorLogger = slf4j::error;
+            exceptionLogger = slf4j::error;
         } catch (Throwable ignored) {
             try {
                 org.apache.logging.log4j.Logger log4j = org.apache.logging.log4j.LogManager.getLogger(MODID);
                 infoLogger = log4j::info;
                 warnLogger = log4j::warn;
                 errorLogger = log4j::error;
+                exceptionLogger = log4j::error;
             } catch (Throwable ignored2) {
                 infoLogger = System.out::println;
                 warnLogger = System.out::println;
                 errorLogger = System.out::println;
+                exceptionLogger = (s, e) -> {
+                    errorLogger.accept(s);
+                    e.printStackTrace();
+                };
             }
         }
     }

@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[24,)"
+loaderVersion = "[41,)"
 license="All Rights Reserved"
 issueTrackerURL="https://github.com/PanSzelescik/proxy-protocol-support/issues"
 [[mods]]
@@ -15,6 +15,6 @@ Proxy Protocol support for Forge servers
 [[dependencies.proxy_protocol_support]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.13,)"
+versionRange = "[1.19,)"
 ordering = "NONE"
 side = "BOTH"

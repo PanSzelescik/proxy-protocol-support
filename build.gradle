@@ -112,7 +112,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.4-45.0.47'
+    minecraft 'net.minecraftforge:forge:1.19.4-45.0.49'
 
     implementation('io.netty:netty-codec-haproxy:4.1.91.Final')
     shade('io.netty:netty-codec-haproxy:4.1.91.Final') {
