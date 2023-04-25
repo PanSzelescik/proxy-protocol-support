@@ -45,9 +45,9 @@ public class ProxyProtocolSupport {
 
         if (config.whitelistTCPShieldServers) {
             ProxyProtocolSupport.infoLogger.accept("TCPShield integration enabled!");
-            whitelistedIPs = Stream
+            whitelistedIPs.addAll(Stream
                     .concat(whitelistedIPs.stream(), TCPShieldIntegration.getWhitelistedIPs().stream())
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toSet()));
         }
 
         ProxyProtocolSupport.infoLogger.accept("Using " + ProxyProtocolSupport.whitelistedIPs.size() + " whitelisted IPs: " + ProxyProtocolSupport.whitelistedIPs);

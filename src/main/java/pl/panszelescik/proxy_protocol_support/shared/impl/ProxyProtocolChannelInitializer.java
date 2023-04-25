@@ -1,23 +1,23 @@
-package pl.panszelescik.proxy_protocol_support.shared;
+package pl.panszelescik.proxy_protocol_support.shared.impl;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.haproxy.HAProxyMessageDecoder;
-import pl.panszelescik.proxy_protocol_support.shared.mixin.ChannelInitializerInvoker;
+import pl.panszelescik.proxy_protocol_support.shared.ProxyProtocolSupport;
 
 /**
  * Initializes HAProxyMessageDecoder and ProxyProtocolHandler
  *
  * @author PanSzelescik
  * @see io.netty.handler.codec.haproxy.HAProxyMessageDecoder
- * @see pl.panszelescik.proxy_protocol_support.shared.ProxyProtocolHandler
+ * @see ProxyProtocolHandler
  */
 public class ProxyProtocolChannelInitializer extends ChannelInitializer {
 
-    private final ChannelInitializerInvoker channelInitializer;
+    private final IChannelInitializer channelInitializer;
 
-    public ProxyProtocolChannelInitializer(ChannelInitializerInvoker invoker) {
-        this.channelInitializer = invoker;
+    public ProxyProtocolChannelInitializer(IChannelInitializer channelInitializer) {
+        this.channelInitializer = channelInitializer;
     }
 
     @Override

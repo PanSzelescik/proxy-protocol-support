@@ -1,10 +1,11 @@
-package pl.panszelescik.proxy_protocol_support.shared;
+package pl.panszelescik.proxy_protocol_support.shared.impl;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.haproxy.HAProxyCommand;
 import io.netty.handler.codec.haproxy.HAProxyMessage;
 import net.minecraft.network.Connection;
+import pl.panszelescik.proxy_protocol_support.shared.ProxyProtocolSupport;
 import pl.panszelescik.proxy_protocol_support.shared.config.CIDRMatcher;
 import pl.panszelescik.proxy_protocol_support.shared.mixin.ProxyProtocolAddressSetter;
 
