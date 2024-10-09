@@ -3,9 +3,8 @@ package pl.panszelescik.proxy_protocol_support.shared.config;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Adds TCPShield's servers to whitelisted IPs
@@ -14,12 +13,20 @@ import java.util.Collection;
  */
 public class TCPShieldIntegration {
 
-    private static final String IPV4 = "https://tcpshield.com/v4/";
+    private static final URI IPV4 = URI.create("https://tcpshield.com/v4/");
+    private static final URI IPV4_CF = URI.create("https://tcpshield.com/v4-cf/");
 
-    public static Collection<CIDRMatcher> getWhitelistedIPs() throws IOException {
-        Collection<CIDRMatcher> matchers = new ArrayList<>();
+    public static ArrayList<CIDRMatcher> getWhitelistedIPs() throws IOException {
+        ArrayList<CIDRMatcher> matchers = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(IPV4).openStream()))) {
+        readFromUrl(matchers, IPV4);
+        readFromUrl(matchers, IPV4_CF);
+
+        return matchers;
+    }
+
+    private static void readFromUrl(ArrayList<CIDRMatcher> matchers, URI uri) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(uri.toURL().openStream()))) {
             while (reader.ready()) {
                 String line = reader.readLine().trim();
                 if (!line.isEmpty()) {
@@ -27,7 +34,5 @@ public class TCPShieldIntegration {
                 }
             }
         }
-
-        return matchers;
     }
 }
