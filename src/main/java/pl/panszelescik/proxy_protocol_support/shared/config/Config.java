@@ -19,6 +19,9 @@ public class Config {
     @SerializedName("proxy-protocol-whitelisted-ips")
     public List<String> whitelistedIPs = new ArrayList<>();
 
+    @SerializedName("proxy-protocol-whitelisted-proxy")
+    public List<String> proxyIPs = new ArrayList<>();
+
     @SerializedName("whitelistTCPShieldServers")
     public boolean whitelistTCPShieldServers = false;
 }

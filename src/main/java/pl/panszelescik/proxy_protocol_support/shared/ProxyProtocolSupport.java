@@ -26,6 +26,7 @@ public class ProxyProtocolSupport {
 
     public static boolean enableProxyProtocol = false;
     public static Collection<CIDRMatcher> whitelistedIPs = new ArrayList<>();
+    public static Collection<String> proxyIPs = new ArrayList<>();
 
     public static void initialize(Config config) throws IOException {
         if (!config.enableProxyProtocol) {
@@ -41,6 +42,11 @@ public class ProxyProtocolSupport {
                 .map(CIDRMatcher::new)
                 .collect(Collectors.toSet());
 
+        proxyIPs = config.proxyIPs
+                .stream()
+                .map(String::new)
+                .collect(Collectors.toSet());
+
         if (config.whitelistTCPShieldServers) {
             infoLogger.accept("TCPShield integration enabled!");
             whitelistedIPs = Stream
@@ -49,6 +55,7 @@ public class ProxyProtocolSupport {
         }
 
         infoLogger.accept("Using " + whitelistedIPs.size() + " whitelisted IPs: " + whitelistedIPs);
+        infoLogger.accept("Using " + proxyIPs.size() + " proxy IPs: " + proxyIPs);
     }
 
     static {
