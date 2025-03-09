@@ -31,11 +31,11 @@ public class ProxyProtocolChannelInitializer extends ChannelInitializer<Channel>
 
         InetSocketAddress remoteAddress = (InetSocketAddress) channel.remoteAddress();
 
+//    TODO: check if the address has the proxy packet then check if it's on whitelisted IPs. if yes, then it's directly accessible
         if (isProxy(remoteAddress)) {
             channel.pipeline()
                     .addAfter("timeout", "haproxy-decoder", new HAProxyMessageDecoder())
                     .addAfter("haproxy-decoder", "haproxy-handler", new ProxyProtocolHandler());
-            ProxyProtocolSupport.infoLogger.accept("Added HAProxy support for: " + remoteAddress);
         } else {
             ProxyProtocolSupport.infoLogger.accept("Skipping HAProxy support for direct connection: " + remoteAddress);
         }
@@ -45,6 +45,7 @@ public class ProxyProtocolChannelInitializer extends ChannelInitializer<Channel>
      * Check if the connection is from a known proxy.
      */
     private boolean isProxy(InetSocketAddress address) {
-        return ProxyProtocolSupport.proxyIPs.contains(address.getAddress().getHostAddress());
+        String ip = address.getAddress().getHostAddress();
+        return ProxyProtocolSupport.proxyIPs.contains(ip) || "127.0.0.1".equals(ip);
     }
 }
