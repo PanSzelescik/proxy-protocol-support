@@ -22,6 +22,7 @@ public class ProxyProtocolSupport {
     public static Consumer<String> infoLogger;
     public static Consumer<String> warnLogger;
     public static Consumer<String> errorLogger;
+    public static Consumer<String> debugLogger;
 
     public static boolean enableProxyProtocol = false;
     // IPs of trusted proxies that MUST send a PROXY header
@@ -69,16 +70,19 @@ public class ProxyProtocolSupport {
             infoLogger = slf4j::info;
             warnLogger = slf4j::warn;
             errorLogger = slf4j::error;
+            debugLogger = slf4j::debug;
         } catch (Throwable ignored) {
             try {
                 org.apache.logging.log4j.Logger log4j = org.apache.logging.log4j.LogManager.getLogger(MODID);
                 infoLogger = log4j::info;
                 warnLogger = log4j::warn;
                 errorLogger = log4j::error;
+                debugLogger = log4j::debug;
             } catch (Throwable ignored2) {
                 infoLogger = System.out::println;
                 warnLogger = System.out::println;
                 errorLogger = System.out::println;
+                debugLogger = (s) -> {};
             }
         }
     }

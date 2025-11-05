@@ -39,7 +39,7 @@ public class ProxyProtocolChannelInitializer extends ChannelInitializer<Channel>
         // 1. Check if the connection is from a configured Trusted Proxy.
         // These connections MUST provide a PROXY protocol header.
         if (ProxyProtocolSupport.proxyServerIPs.contains(remoteIp)) {
-            ProxyProtocolSupport.infoLogger.accept("Accepted connection from trusted proxy: " + remoteIp + ". Applying PROXY protocol handlers.");
+            ProxyProtocolSupport.debugLogger.accept("Accepted connection from trusted proxy: " + remoteIp + ". Applying PROXY protocol handlers.");
             channel.pipeline()
                     .addAfter("timeout", "haproxy-decoder", new HAProxyMessageDecoder())
                     .addAfter("haproxy-decoder", "haproxy-handler", new ProxyProtocolHandler());
@@ -50,7 +50,7 @@ public class ProxyProtocolChannelInitializer extends ChannelInitializer<Channel>
         // These connections are treated as regular Minecraft players.
         for (CIDRMatcher matcher : ProxyProtocolSupport.directAccessIPs) {
             if (matcher.matches(remoteAddress.getAddress())) {
-                ProxyProtocolSupport.infoLogger.accept("Accepted direct connection from whitelisted IP: " + remoteIp);
+                ProxyProtocolSupport.debugLogger.accept("Accepted direct connection from whitelisted IP: " + remoteIp);
                 // Do nothing else; allow the connection to proceed normally.
                 return;
             }
