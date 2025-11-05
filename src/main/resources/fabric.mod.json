@@ -2,16 +2,16 @@
   "schemaVersion": 1,
   "id": "proxy_protocol_support",
   "version": "${version}",
-  "name": "Proxy Protocol Support",
-  "description": "Proxy Protocol support for Fabric and Quilt servers",
+  "name": "Proxy Protocol Support (Hybrid Fork)",
+  "description": "A fork of Proxy Protocol Support with a secure hybrid mode for both proxied and direct connections.",
   "authors": [
+    "jtnqr",
     "PanSzelescik"
   ],
   "contact": {
-    "website": "https://www.curseforge.com/minecraft/mc-mods/proxy-protocol-support",
-    "homepage": "https://modrinth.com/mod/proxy-protocol-support",
-    "repo": "https://github.com/PanSzelescik/proxy-protocol-support",
-    "issues": "https://github.com/PanSzelescik/proxy-protocol-support/issues"
+    "homepage": "https://github.com/jtnqr/proxy-protocol-support",
+    "repo": "https://github.com/jtnqr/proxy-protocol-support",
+    "issues": "https://github.com/jtnqr/proxy-protocol-support/issues"
   },
   "license": "MIT",
   "environment": "server",

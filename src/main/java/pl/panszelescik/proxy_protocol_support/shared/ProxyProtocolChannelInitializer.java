@@ -3,15 +3,16 @@ package pl.panszelescik.proxy_protocol_support.shared;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.haproxy.HAProxyMessageDecoder;
+import pl.panszelescik.proxy_protocol_support.shared.config.CIDRMatcher;
 import pl.panszelescik.proxy_protocol_support.shared.mixin.ChannelInitializerInvoker;
 import java.net.InetSocketAddress;
 
 /**
- * Initializes HAProxyMessageDecoder and ProxyProtocolHandler conditionally
+ * Initializes the connection pipeline based on a secure triage system.
+ * It decides whether a connection should be handled as a proxied connection,
+ * a direct connection, or be rejected.
  *
  * @author PanSzelescik
- * @see io.netty.handler.codec.haproxy.HAProxyMessageDecoder
- * @see pl.panszelescik.proxy_protocol_support.shared.ProxyProtocolHandler
  */
 public class ProxyProtocolChannelInitializer extends ChannelInitializer<Channel> {
 
@@ -23,29 +24,41 @@ public class ProxyProtocolChannelInitializer extends ChannelInitializer<Channel>
 
     @Override
     protected void initChannel(Channel channel) throws Exception {
+        // First, run the original Minecraft channel initialization to add default handlers.
         this.channelInitializer.invokeInitChannel(channel);
 
         if (!ProxyProtocolSupport.enableProxyProtocol) {
-            return;
+            return; // Mod is disabled, do nothing further.
         }
 
-        InetSocketAddress remoteAddress = (InetSocketAddress) channel.remoteAddress();
+        final InetSocketAddress remoteAddress = (InetSocketAddress) channel.remoteAddress();
+        final String remoteIp = remoteAddress.getAddress().getHostAddress();
 
-//    TODO: check if the address has the proxy packet then check if it's on whitelisted IPs. if yes, then it's directly accessible
-        if (isProxy(remoteAddress)) {
+        // --- Connection Triage Logic ---
+
+        // 1. Check if the connection is from a configured Trusted Proxy.
+        // These connections MUST provide a PROXY protocol header.
+        if (ProxyProtocolSupport.proxyServerIPs.contains(remoteIp)) {
+            ProxyProtocolSupport.infoLogger.accept("Accepted connection from trusted proxy: " + remoteIp + ". Applying PROXY protocol handlers.");
             channel.pipeline()
                     .addAfter("timeout", "haproxy-decoder", new HAProxyMessageDecoder())
                     .addAfter("haproxy-decoder", "haproxy-handler", new ProxyProtocolHandler());
-        } else {
-            ProxyProtocolSupport.infoLogger.accept("Skipping HAProxy support for direct connection: " + remoteAddress);
+            return;
         }
-    }
 
-    /**
-     * Check if the connection is from a known proxy.
-     */
-    private boolean isProxy(InetSocketAddress address) {
-        String ip = address.getAddress().getHostAddress();
-        return ProxyProtocolSupport.proxyIPs.contains(ip) || "127.0.0.1".equals(ip);
+        // 2. Check if the connection is from an IP allowed to connect directly.
+        // These connections are treated as regular Minecraft players.
+        for (CIDRMatcher matcher : ProxyProtocolSupport.directAccessIPs) {
+            if (matcher.matches(remoteAddress.getAddress())) {
+                ProxyProtocolSupport.infoLogger.accept("Accepted direct connection from whitelisted IP: " + remoteIp);
+                // Do nothing else; allow the connection to proceed normally.
+                return;
+            }
+        }
+
+        // 3. If the IP is in neither list, it's an unauthorized connection.
+        // This provides a "fail-closed" security model.
+        ProxyProtocolSupport.warnLogger.accept("REJECTED unauthorized direct connection from: " + remoteIp);
+        channel.close();
     }
 }
