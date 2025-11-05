@@ -2,6 +2,7 @@ package pl.panszelescik.proxy_protocol_support.shared;
 
 import pl.panszelescik.proxy_protocol_support.shared.config.CIDRMatcher;
 import pl.panszelescik.proxy_protocol_support.shared.config.Config;
+import pl.panszelescik.proxy_protocol_support.shared.config.TCPShieldIntegration;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,12 +46,24 @@ public class ProxyProtocolSupport {
                 .map(CIDRMatcher::new)
                 .collect(Collectors.toList());
 
+        if (config.whitelistTCPShieldServers) {
+            infoLogger.accept("TCPShield integration enabled! Fetching official IPs...");
+            try {
+                Collection<String> tcpShieldIPs = TCPShieldIntegration.getWhitelistedIPs().stream()
+                        .map(CIDRMatcher::toString) // Convert CIDRMatcher back to String if necessary
+                        .collect(Collectors.toList());
+                proxyServerIPs.addAll(tcpShieldIPs);
+                infoLogger.accept("Successfully added " + tcpShieldIPs.size() + " TCPShield IPs to the trusted proxy list.");
+            } catch (IOException e) {
+                errorLogger.accept("Failed to fetch TCPShield IPs: " + e.getMessage());
+            }
+        }
+
         infoLogger.accept("Loaded " + proxyServerIPs.size() + " trusted proxy IPs: " + proxyServerIPs);
         infoLogger.accept("Loaded " + directAccessIPs.size() + " direct access rules: " + config.directAccessIPs);
     }
 
     static {
-        // Logger initialization remains the same
         try {
             org.slf4j.Logger slf4j = org.slf4j.LoggerFactory.getLogger(MODID);
             infoLogger = slf4j::info;

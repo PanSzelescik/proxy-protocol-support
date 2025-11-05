@@ -20,8 +20,6 @@ public class Config {
     // directAccessIPs list from config
     public List<String> directAccessIPs = Arrays.asList("127.0.0.1", "192.168.0.0/16");
 
-    // The old config options are now removed to avoid confusion.
-    // public List<String> whitelistedIPs; (REMOVED)
-    // public List<String> proxyIPs; (REMOVED)
-    // public boolean whitelistTCPShieldServers; (REMOVED)
+    // When true, automatically fetches TCPShield's official proxy IPs and adds them to the proxyServerIPs list.
+    public boolean whitelistTCPShieldServers = false; // Default to false for security.
 }
