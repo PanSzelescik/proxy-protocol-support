@@ -16,13 +16,13 @@ Supports Minecraft versions 1.14-1.21.4 and probably later (untested).
 
 This fork allows your Minecraft server to simultaneously accept connections from a **trusted proxy** (using the PROXY protocol) and from **trusted direct-access IPs**. This is perfect for setups where you want to hide your server's IP behind a proxy, while still allowing admins or local players to connect directly.
 
-The mod operates on a secure **"Default Deny"** principle. If an incoming connection's IP address is not explicitly whitelisted in one of the two lists below, it will be **rejected**. This prevents unauthorized users from bypassing your proxy and connecting directly to your server's real IP address.
+The mod operates on a secure **"Default Deny"** principle. If an incoming connection's IP address is not explicitly whitelisted in one of the lists below, it will be **rejected**. This prevents unauthorized users from bypassing your proxy and connecting directly to your server's real IP address.
 
 ---
 
 ## Configuration
 
-Configuration is handled in `config/proxy_protocol_support.toml`.
+Configuration is handled in `config/proxy_protocol_support.json`.
 
 ### `enableProxyProtocol`
 Set to `true` to enable the mod's functionality.
@@ -35,6 +35,10 @@ A list of IP addresses that are your trusted proxy servers. Connections from the
 ### `directAccessIPs`
 A list of IPs or CIDR ranges that are allowed to connect directly **without** a PROXY Protocol header. This is ideal for admins, local network players, and server-side tools.
 -   **Default**: `["127.0.0.1", "192.168.0.0/16"]`
+
+### `whitelistTCPShieldServers`
+When `true`, the mod automatically fetches TCPShield's official proxy IPs and adds them to the trusted `proxyServerIPs` list.
+-   **Default**: `false`
 
 ---
 
