@@ -3,8 +3,9 @@
   "id": "proxy_protocol_support",
   "version": "${version}",
   "name": "Proxy Protocol Support",
-  "description": "Proxy Protocol support for Fabric and Quilt servers",
+  "description": "Proxy Protocol Support for Fabric servers.",
   "authors": [
+    "jtnqr",
     "PanSzelescik"
   ],
   "contact": {

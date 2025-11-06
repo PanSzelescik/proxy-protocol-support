@@ -5,14 +5,12 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.haproxy.HAProxyCommand;
 import io.netty.handler.codec.haproxy.HAProxyMessage;
 import net.minecraft.network.Connection;
-import pl.panszelescik.proxy_protocol_support.shared.config.CIDRMatcher;
 import pl.panszelescik.proxy_protocol_support.shared.mixin.ProxyProtocolAddressSetter;
-
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 /**
- * Reads HAProxyMessage to set valid Player IP
+ * Reads a decoded HAProxyMessage to set the player's real IP address.
+ * This handler is only added to the pipeline for connections from trusted proxies.
  *
  * @author PanSzelescik
  * @see io.netty.handler.codec.haproxy.HAProxyMessage
@@ -22,49 +20,34 @@ public class ProxyProtocolHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof HAProxyMessage) {
-            HAProxyMessage message = ((HAProxyMessage) msg);
-            if (message.command() == HAProxyCommand.PROXY) {
-                final String realAddress = message.sourceAddress();
-                final int realPort = message.sourcePort();
+            final HAProxyMessage message = ((HAProxyMessage) msg);
+            try {
+                // We only care about PROXY commands. Other commands are ignored.
+                if (message.command() == HAProxyCommand.PROXY) {
+                    final String realAddress = message.sourceAddress();
+                    final int realPort = message.sourcePort();
 
-                final InetSocketAddress socketAddr = new InetSocketAddress(realAddress, realPort);
-
-                Connection connection = ((Connection) ctx.channel().pipeline().get("packet_handler"));
-                SocketAddress proxyAddress = connection.getRemoteAddress();
-
-                if (!ProxyProtocolSupport.whitelistedIPs.isEmpty()) {
-                    if (proxyAddress instanceof InetSocketAddress) {
-                        InetSocketAddress proxySocketAddress = ((InetSocketAddress) proxyAddress);
-                        boolean isWhitelistedIP = false;
-
-                        for (CIDRMatcher matcher : ProxyProtocolSupport.whitelistedIPs) {
-                            if (matcher.matches(proxySocketAddress.getAddress())) {
-                                isWhitelistedIP = true;
-                                break;
-                            }
-                        }
-
-                        if (!isWhitelistedIP) {
-                            if (ctx.channel().isOpen()) {
-                                ctx.disconnect();
-                                ProxyProtocolSupport.warnLogger.accept("Blocked proxy IP: " + proxySocketAddress + " when tried to connect!");
-                            }
-                            return;
-                        }
-                    } else {
-                        ProxyProtocolSupport.warnLogger.accept("**********************************************************************");
-                        ProxyProtocolSupport.warnLogger.accept("* Detected other SocketAddress than InetSocketAddress!               *");
-                        ProxyProtocolSupport.warnLogger.accept("* Please report it with logs to mod author to provide compatibility! *");
-                        ProxyProtocolSupport.warnLogger.accept("* https://github.com/PanSzelescik/proxy-protocol-support/issues      *");
-                        ProxyProtocolSupport.warnLogger.accept("**********************************************************************");
-                        ProxyProtocolSupport.warnLogger.accept(proxyAddress.getClass().toString());
-                        ProxyProtocolSupport.warnLogger.accept(proxyAddress.toString());
+                    // A valid PROXY header must contain a source address.
+                    if (realAddress == null) {
+                        ProxyProtocolSupport.warnLogger.accept("Received valid PROXY header from " + ctx.channel().remoteAddress() + " but source address was null. Closing connection.");
+                        ctx.close();
+                        return;
                     }
-                }
 
-                ((ProxyProtocolAddressSetter) connection).setAddress(socketAddr);
+                    final InetSocketAddress playerAddress = new InetSocketAddress(realAddress, realPort);
+
+                    // Get the Minecraft Connection object from the pipeline.
+                    final Connection connection = (Connection) ctx.channel().pipeline().get("packet_handler");
+
+                    // Use the mixin to set the player's real address.
+                    ((ProxyProtocolAddressSetter) connection).setAddress(playerAddress);
+                }
+            } finally {
+                // It is crucial to release the HAProxyMessage to prevent memory leaks.
+                message.release();
             }
         } else {
+            // Pass any other messages (like the initial Minecraft handshake) down the pipeline.
             super.channelRead(ctx, msg);
         }
     }

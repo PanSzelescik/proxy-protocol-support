@@ -1,24 +1,26 @@
 package pl.panszelescik.proxy_protocol_support.shared.config;
 
-import com.google.gson.annotations.SerializedName;
-
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * Class which represents configuration file
+ * This class represents the structure of the config.toml file.
+ * The variable names here MUST match the keys in the TOML file.
  *
  * @author PanSzelescik
- * @see Configuration
  */
 public class Config {
 
-    @SerializedName("enable-proxy-protocol")
+    // enableProxyProtocol key from config
     public boolean enableProxyProtocol = true;
 
-    @SerializedName("proxy-protocol-whitelisted-ips")
-    public List<String> whitelistedIPs = new ArrayList<>();
+    // proxyServerIPs list from config
+    public List<String> proxyServerIPs = Collections.singletonList("127.0.0.1");
 
-    @SerializedName("whitelistTCPShieldServers")
-    public boolean whitelistTCPShieldServers = false;
+    // directAccessIPs list from config
+    public List<String> directAccessIPs = Arrays.asList("127.0.0.1", "192.168.0.0/16");
+
+    // When true, automatically fetches TCPShield's official proxy IPs and adds them to the proxyServerIPs list.
+    public boolean whitelistTCPShieldServers = false; // Default to false for security.
 }
