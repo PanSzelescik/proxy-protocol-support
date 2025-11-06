@@ -1,6 +1,7 @@
 package pl.panszelescik.proxy_protocol_support.shared.config;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ public class Config {
     public boolean enableProxyProtocol = true;
 
     // proxyServerIPs list from config
-    public List<String> proxyServerIPs = Arrays.asList("127.0.0.1");
+    public List<String> proxyServerIPs = Collections.singletonList("127.0.0.1");
 
     // directAccessIPs list from config
     public List<String> directAccessIPs = Arrays.asList("127.0.0.1", "192.168.0.0/16");

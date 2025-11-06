@@ -20,7 +20,7 @@ public class ProxyProtocolHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof HAProxyMessage) {
-            HAProxyMessage message = ((HAProxyMessage) msg);
+            final HAProxyMessage message = ((HAProxyMessage) msg);
             try {
                 // We only care about PROXY commands. Other commands are ignored.
                 if (message.command() == HAProxyCommand.PROXY) {
@@ -37,7 +37,7 @@ public class ProxyProtocolHandler extends ChannelInboundHandlerAdapter {
                     final InetSocketAddress playerAddress = new InetSocketAddress(realAddress, realPort);
 
                     // Get the Minecraft Connection object from the pipeline.
-                    Connection connection = (Connection) ctx.channel().pipeline().get("packet_handler");
+                    final Connection connection = (Connection) ctx.channel().pipeline().get("packet_handler");
 
                     // Use the mixin to set the player's real address.
                     ((ProxyProtocolAddressSetter) connection).setAddress(playerAddress);

@@ -1,20 +1,19 @@
 # Proxy Protocol Support
 
-This is a fork of PanSzelescik's [Proxy Protocol Support mod](https://github.com/PanSzelescik/proxy-protocol-support). This version is enhanced to provide a more secure and flexible system for servers that need to accept both proxied and direct connections simultaneously.
 
----
-
-Proxy Protocol Support is a [Fabric](https://fabricmc.net/) and [Quilt](https://quiltmc.org/) mod which adds support for [Proxy Protocol (HAProxy)](https://www.haproxy.com/blog/haproxy/proxy-protocol/ "Proxy Protocol (HAProxy)") for your Minecraft server.
+Proxy Protocol Support is a [Fabric](https://fabricmc.net/) and [Quilt](https://quiltmc.org/) mod which adds support for [Proxy Protocol (HAProxy)](https://www.haproxy.com/blog/haproxy/proxy-protocol/ "Proxy Protocol (HAProxy)") for your Minecraft server. It allows to accept both proxied and direct connections simultaneously.
 
 For example you can use [TCPShield](https://tcpshield.com/ "TCPShield") or other software ([Nginx](https://nginx.org/en/docs/stream/ngx_stream_proxy_module.html#proxy_protocol "Nginx"), [FRP](https://gofrp.org/)) to forward traffic, and hide your server's IP address. Without Proxy Protocol, your console will only show the proxy's IP address. By reading the Proxy Protocol packet, this mod makes showing the player's real IP address possible.
 
 **This is a Server-Side only mod; it does nothing when installed on a client.**
 
-Supports Minecraft versions 1.14-1.21.4 and probably later (untested).
+Supports Minecraft versions 1.14-1.21.10 and probably later (untested).
 
-## New in this Fork: Secure Hybrid Mode
+---
 
-This fork allows your Minecraft server to simultaneously accept connections from a **trusted proxy** (using the PROXY protocol) and from **trusted direct-access IPs**. This is perfect for setups where you want to hide your server's IP behind a proxy, while still allowing admins or local players to connect directly.
+## Secure Hybrid Mode
+
+This mod allows your Minecraft server to simultaneously accept connections from a **trusted proxy** (using the PROXY protocol) and from **trusted direct-access IPs**. This is perfect for setups where you want to hide your server's IP behind a proxy, while still allowing admins or local players to connect directly.
 
 The mod operates on a secure **"Default Deny"** principle. If an incoming connection's IP address is not explicitly whitelisted in one of the lists below, it will be **rejected**. This prevents unauthorized users from bypassing your proxy and connecting directly to your server's real IP address.
 

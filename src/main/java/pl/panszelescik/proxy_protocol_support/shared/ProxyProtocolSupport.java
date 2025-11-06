@@ -26,33 +26,34 @@ public class ProxyProtocolSupport {
 
     public static boolean enableProxyProtocol = false;
     // IPs of trusted proxies that MUST send a PROXY header
-    public static Collection<String> proxyServerIPs = new HashSet<>();
+    public static Collection<CIDRMatcher> proxyServerIPs = new HashSet<>();
     // IPs/CIDRs that can connect directly WITHOUT a PROXY header
-    public static Collection<CIDRMatcher> directAccessIPs = new ArrayList<>();
+    public static Collection<CIDRMatcher> directAccessIPs = new HashSet<>();
 
     public static void initialize(Config config) throws IOException {
-        if (!config.enableProxyProtocol) {
-            infoLogger.accept("Proxy Protocol Support is disabled in the config.");
+        enableProxyProtocol = config.enableProxyProtocol;
+
+        if (!enableProxyProtocol) {
+            warnLogger.accept("Proxy Protocol Support is disabled in the config.");
             return;
         }
 
         infoLogger.accept("Proxy Protocol Support is enabled!");
 
-        enableProxyProtocol = config.enableProxyProtocol;
-
-        proxyServerIPs = new HashSet<>(config.proxyServerIPs);
+        proxyServerIPs = config.proxyServerIPs
+                .stream()
+                .map(CIDRMatcher::new)
+                .collect(Collectors.toSet());
 
         directAccessIPs = config.directAccessIPs
                 .stream()
                 .map(CIDRMatcher::new)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
 
         if (config.whitelistTCPShieldServers) {
             infoLogger.accept("TCPShield integration enabled! Fetching official IPs...");
             try {
-                Collection<String> tcpShieldIPs = TCPShieldIntegration.getWhitelistedIPs().stream()
-                        .map(CIDRMatcher::toString) // Convert CIDRMatcher back to String if necessary
-                        .collect(Collectors.toList());
+                final HashSet<CIDRMatcher> tcpShieldIPs = TCPShieldIntegration.getWhitelistedIPs();
                 proxyServerIPs.addAll(tcpShieldIPs);
                 infoLogger.accept("Successfully added " + tcpShieldIPs.size() + " TCPShield IPs to the trusted proxy list.");
             } catch (IOException e) {
@@ -66,14 +67,14 @@ public class ProxyProtocolSupport {
 
     static {
         try {
-            org.slf4j.Logger slf4j = org.slf4j.LoggerFactory.getLogger(MODID);
+            final org.slf4j.Logger slf4j = org.slf4j.LoggerFactory.getLogger(MODID);
             infoLogger = slf4j::info;
             warnLogger = slf4j::warn;
             errorLogger = slf4j::error;
             debugLogger = slf4j::debug;
         } catch (Throwable ignored) {
             try {
-                org.apache.logging.log4j.Logger log4j = org.apache.logging.log4j.LogManager.getLogger(MODID);
+                final org.apache.logging.log4j.Logger log4j = org.apache.logging.log4j.LogManager.getLogger(MODID);
                 infoLogger = log4j::info;
                 warnLogger = log4j::warn;
                 errorLogger = log4j::error;
@@ -82,7 +83,7 @@ public class ProxyProtocolSupport {
                 infoLogger = System.out::println;
                 warnLogger = System.out::println;
                 errorLogger = System.out::println;
-                debugLogger = (s) -> {};
+                debugLogger = (msg) -> {};
             }
         }
     }

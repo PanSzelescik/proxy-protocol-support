@@ -21,7 +21,7 @@ public class ProxyProtocolInitializer implements DedicatedServerModInitializer {
     @Override
     public void onInitializeServer() {
         try {
-            Config config = Configuration.loadConfig(FabricLoader.getInstance().getConfigDir().toFile());
+            final Config config = Configuration.loadConfig(FabricLoader.getInstance().getConfigDir().toFile());
             ProxyProtocolSupport.initialize(config);
         } catch (IOException e) {
             ProxyProtocolSupport.errorLogger.accept("Error loading config file:");
