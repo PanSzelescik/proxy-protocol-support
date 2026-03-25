@@ -23,5 +23,9 @@
   },
   "mixins": [
     "proxy_protocol_support.mixins.json"
-  ]
+  ],
+  "depends": {
+    "minecraft": ">=26.1",
+    "java": ">=25"
+  }
 }

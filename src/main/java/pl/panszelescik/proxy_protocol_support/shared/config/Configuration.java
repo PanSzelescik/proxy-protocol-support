@@ -2,12 +2,11 @@ package pl.panszelescik.proxy_protocol_support.shared.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.commons.io.FileUtils;
 import pl.panszelescik.proxy_protocol_support.shared.ProxyProtocolSupport;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 /**
  * Loads and saves Config
@@ -30,7 +29,7 @@ public class Configuration {
     }
 
     private static Config loadConfigFile(File configFile) throws IOException {
-        final String string = FileUtils.readFileToString(configFile, StandardCharsets.UTF_8);
+        final String string = Files.readString(configFile.toPath());
 
         return GSON.fromJson(string, Config.class);
     }
@@ -42,7 +41,7 @@ public class Configuration {
     private static Config saveConfig(File configFile, Config config) throws IOException {
         final String string = GSON.toJson(config);
 
-        FileUtils.writeStringToFile(configFile, string, StandardCharsets.UTF_8);
+        Files.writeString(configFile.toPath(), string);
 
         return config;
     }

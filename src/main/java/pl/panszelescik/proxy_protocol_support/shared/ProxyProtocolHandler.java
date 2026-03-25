@@ -19,8 +19,7 @@ public class ProxyProtocolHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (msg instanceof HAProxyMessage) {
-            final HAProxyMessage message = ((HAProxyMessage) msg);
+        if (msg instanceof HAProxyMessage message) {
             try {
                 // We only care about PROXY commands. Other commands are ignored.
                 if (message.command() == HAProxyCommand.PROXY) {
@@ -50,5 +49,11 @@ public class ProxyProtocolHandler extends ChannelInboundHandlerAdapter {
             // Pass any other messages (like the initial Minecraft handshake) down the pipeline.
             super.channelRead(ctx, msg);
         }
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        ProxyProtocolSupport.warnLogger.accept("Rejected connection without valid Proxy handler: " + ctx.channel().remoteAddress());
+        ctx.close();
     }
 }

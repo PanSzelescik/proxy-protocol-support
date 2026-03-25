@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "pl.panszelescik.proxy_protocol_support.shared.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_25",
   "server": [
     "ChannelInitializerInvoker",
     "ProxyProtocolAddressSetter",
