@@ -32,7 +32,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
       - name: Publish Fabric
-        uses: actions/upload-artifact@v56
+        uses: actions/upload-artifact@v6
         with:
           name: Fabric
           path: build/libs/
