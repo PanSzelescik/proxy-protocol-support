@@ -1,0 +1,36 @@
+plugins {
+    id 'net.fabricmc.fabric-loom'
+}
+
+base {
+    archivesName = rootProject.archives_base_name + "-fabric"
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+    compileOnly "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+
+    implementation project(":common")
+
+    implementation group: 'io.netty', name: 'netty-codec-haproxy', version: rootProject.netty_haproxy_version
+    include group: 'io.netty', name: 'netty-codec-haproxy', version: rootProject.netty_haproxy_version
+}
+
+jar {
+    from project(":common").sourceSets.main.output
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+sourcesJar {
+    def commonSources = project(":common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}

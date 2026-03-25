@@ -1,64 +1,25 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+    id 'net.fabricmc.fabric-loom' version "${loom_version}" apply false
 }
 
-version = project.mod_version
-group = project.maven_group
+subprojects {
+    apply plugin: "java"
 
-repositories {
-    // Add repositories to retrieve artifacts from in here.
-    // You should only use this when depending on other mods because
-    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
-    // for more information about repositories.
-}
-
-loom {
-    splitEnvironmentSourceSets()
-
-    mods {
-        "proxy_protocol_support" {
-            sourceSet sourceSets.main
-        }
+    base {
+        archivesName = rootProject.archives_base_name
     }
-}
 
-dependencies {
-    // To change the versions see the gradle.properties file
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    version = rootProject.mod_version
+    group = rootProject.maven_group
 
-    implementation group: 'io.netty', name: 'netty-codec-haproxy', version: '4.2.10.Final'
-    include group: 'io.netty', name: 'netty-codec-haproxy', version: '4.2.10.Final'
-}
-
-processResources {
-    inputs.property "version", project.version
-
-    filesMatching("fabric.mod.json") {
-        expand "version": project.version
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = "UTF-8"
+        options.release = 25
     }
-}
 
-tasks.withType(JavaCompile).configureEach {
-    it.options.release = 25
-    it.options.encoding = "UTF-8"
-}
-
-java {
-    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-    // if it is present.
-    // If you remove this line, sources will not be generated.
-    withSourcesJar()
-
-    sourceCompatibility = JavaVersion.VERSION_25
-    targetCompatibility = JavaVersion.VERSION_25
-}
-
-jar {
-    inputs.property "archivesName", project.base.archivesName
-
-    from("LICENSE") {
-        rename { "${it}_${inputs.properties.archivesName}"}
+    java {
+        withSourcesJar()
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
     }
 }

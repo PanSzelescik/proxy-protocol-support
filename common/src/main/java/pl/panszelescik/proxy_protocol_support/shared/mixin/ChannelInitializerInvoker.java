@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
  * @author PanSzelescik
  * @see io.netty.channel.ChannelInitializer#initChannel(Channel)
  */
-@Mixin(ChannelInitializer.class)
+@Mixin(value = ChannelInitializer.class, remap = false)
 public interface ChannelInitializerInvoker {
 
     @Invoker(value = "initChannel", remap = false)

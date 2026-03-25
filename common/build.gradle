@@ -1,0 +1,10 @@
+plugins {
+    id 'net.fabricmc.fabric-loom'
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+    compileOnly "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+
+    compileOnly group: 'io.netty', name: 'netty-codec-haproxy', version: rootProject.netty_haproxy_version
+}

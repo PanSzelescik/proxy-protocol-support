@@ -1,0 +1,54 @@
+plugins {
+    id "net.neoforged.moddev" version "2.0.141"
+}
+
+base {
+    archivesName = rootProject.archives_base_name + "-neoforge"
+}
+
+neoForge {
+    version = rootProject.neoforge_version
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+        }
+    }
+
+    mods {
+        proxy_protocol_support {
+            sourceSet(sourceSets.main)
+            sourceSet(project(':common').sourceSets.main)
+        }
+    }
+}
+
+dependencies {
+    implementation project(":common")
+
+    jarJar(group: 'io.netty', name: 'netty-codec-haproxy', version: rootProject.netty_haproxy_version) {
+        transitive = false
+    }
+}
+
+jar {
+    from project(":common").sourceSets.main.output
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("META-INF/neoforge.mods.toml") {
+        expand "version": project.version
+    }
+}
+
+sourcesJar {
+    def commonSources = project(":common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}

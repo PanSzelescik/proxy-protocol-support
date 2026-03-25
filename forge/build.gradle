@@ -1,0 +1,84 @@
+plugins {
+    id "net.minecraftforge.gradle" version "[7.0.17,8)"
+}
+
+base {
+    archivesName = rootProject.archives_base_name + "-forge"
+}
+
+minecraft {
+    runs {
+        configureEach {
+            workingDir = layout.projectDirectory.dir('run')
+            systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
+        }
+
+        register('server') {
+            args '--nogui'
+            mods {
+                proxy_protocol_support {
+                    source(sourceSets.main)
+                    source(project(':common').sourceSets.main)
+                }
+            }
+        }
+    }
+}
+
+repositories {
+    maven { url rootProject.file('.gradle/mavenizer/repo').toURI() }
+    maven { url "https://maven.minecraftforge.net/" }
+    maven { url "https://libraries.minecraft.net/" }
+    mavenCentral()
+}
+
+configurations {
+    embed {
+        canBeConsumed = false
+        canBeResolved = true
+        transitive = false
+    }
+    compileClasspath.extendsFrom embed
+}
+
+sourceSets.main.output.resourcesDir = sourceSets.main.java.classesDirectory.get().asFile
+
+tasks.register('copyCommonToBuild', Copy) {
+    dependsOn ':common:classes'
+    from project(':common').sourceSets.main.output.classesDirs
+    into sourceSets.main.java.classesDirectory
+}
+
+classes.dependsOn copyCommonToBuild
+
+dependencies {
+    implementation minecraft.dependency("net.minecraftforge:forge:${rootProject.forge_version}")
+    annotationProcessor 'net.minecraftforge:eventbus-validator:7.0.1'
+    compileOnly project(":common")
+
+    embed group: 'io.netty', name: 'netty-codec-haproxy', version: rootProject.netty_haproxy_version
+}
+
+jar {
+    from project(":common").sourceSets.main.output
+    from { configurations.embed.collect { it.isDirectory() ? it : zipTree(it) } }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes(['MixinConfigs': 'proxy_protocol_support.mixins.json'])
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("META-INF/mods.toml") {
+        expand "version": project.version
+    }
+}
+
+sourcesJar {
+    def commonSources = project(":common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}
