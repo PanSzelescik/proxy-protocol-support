@@ -50,10 +50,4 @@ public class ProxyProtocolHandler extends ChannelInboundHandlerAdapter {
             super.channelRead(ctx, msg);
         }
     }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        ProxyProtocolSupport.warnLogger.accept("Rejected connection without valid Proxy handler: " + ctx.channel().remoteAddress());
-        ctx.close();
-    }
 }
