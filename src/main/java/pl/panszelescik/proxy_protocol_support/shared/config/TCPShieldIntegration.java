@@ -35,8 +35,13 @@ public class TCPShieldIntegration {
                 .GET()
                 .build();
 
-        client.send(request, HttpResponse.BodyHandlers.ofString())
-                .body()
+        final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        final int statusCode = response.statusCode();
+        if (statusCode < 200 || statusCode >= 300) {
+            throw new IOException("Failed to fetch " + uri + ": HTTP " + statusCode);
+        }
+
+        response.body()
                 .lines()
                 .map(String::trim)
                 .filter(l -> !l.isEmpty() && !l.startsWith("#") && !l.startsWith("127.0.0.1"))
