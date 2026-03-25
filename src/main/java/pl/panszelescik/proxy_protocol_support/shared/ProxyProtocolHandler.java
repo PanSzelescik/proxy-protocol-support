@@ -19,8 +19,7 @@ public class ProxyProtocolHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (msg instanceof HAProxyMessage) {
-            final HAProxyMessage message = ((HAProxyMessage) msg);
+        if (msg instanceof HAProxyMessage message) {
             try {
                 // We only care about PROXY commands. Other commands are ignored.
                 if (message.command() == HAProxyCommand.PROXY) {

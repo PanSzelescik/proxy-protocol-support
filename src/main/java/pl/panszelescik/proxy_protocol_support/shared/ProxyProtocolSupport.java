@@ -4,7 +4,6 @@ import pl.panszelescik.proxy_protocol_support.shared.config.CIDRMatcher;
 import pl.panszelescik.proxy_protocol_support.shared.config.Config;
 import pl.panszelescik.proxy_protocol_support.shared.config.TCPShieldIntegration;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.function.Consumer;
@@ -56,7 +55,7 @@ public class ProxyProtocolSupport {
                 final HashSet<CIDRMatcher> tcpShieldIPs = TCPShieldIntegration.getWhitelistedIPs();
                 proxyServerIPs.addAll(tcpShieldIPs);
                 infoLogger.accept("Successfully added " + tcpShieldIPs.size() + " TCPShield IPs to the trusted proxy list.");
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 errorLogger.accept("Failed to fetch TCPShield IPs: " + e.getMessage());
             }
         }
