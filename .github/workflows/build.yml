@@ -31,6 +31,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
       - name: Build with Gradle
         run: ./gradlew build
+      - name: Run tests
+        run: ./gradlew test
       - name: Publish Fabric
         uses: actions/upload-artifact@v6
         with:
