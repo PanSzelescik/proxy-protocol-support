@@ -8,6 +8,7 @@ import pl.panszelescik.proxy_protocol_support.shared.mixin.ChannelInitializerInv
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Collection;
 
 /**
  * Initializes the connection pipeline based on a secure triage system.
@@ -37,32 +38,33 @@ public class ProxyProtocolChannelInitializer extends ChannelInitializer<Channel>
         final InetAddress remoteIp = remoteAddress.getAddress();
 
         // --- Connection Triage Logic ---
+        boolean isProxy = matchesAny(remoteIp, ProxyProtocolSupport.proxyServerIPs);
+        boolean isDirect = matchesAny(remoteIp, ProxyProtocolSupport.directAccessIPs);
 
-        // 1. Check if the connection is from a configured Trusted Proxy.
-        // These connections MUST provide a PROXY protocol header.
-        for (CIDRMatcher matcher : ProxyProtocolSupport.proxyServerIPs) {
-            if (matcher.matches(remoteIp)) {
-                ProxyProtocolSupport.debugLogger.accept("Accepted connection from trusted proxy: " + remoteIp + ". Applying PROXY protocol handlers.");
-                channel.pipeline()
-                        .addAfter("timeout", "haproxy-decoder", new HAProxyMessageDecoder())
-                        .addAfter("haproxy-decoder", "haproxy-handler", new ProxyProtocolHandler());
-                return;
+        if (isProxy && isDirect) {
+            // Hybrid mode: detect PROXY protocol presence at runtime.
+            // If header found → proxy mode, otherwise → direct connection.
+            ProxyProtocolSupport.debugLogger.accept("Connection from " + remoteIp + " matches both proxy and direct lists. Enabling hybrid detection.");
+            channel.pipeline().addAfter("timeout", "haproxy-detector", new ProxyProtocolDetector());
+        } else if (isProxy) {
+            ProxyProtocolSupport.debugLogger.accept("Accepted connection from trusted proxy: " + remoteIp + ". Applying PROXY protocol handlers.");
+            channel.pipeline()
+                    .addAfter("timeout", "haproxy-decoder", new HAProxyMessageDecoder())
+                    .addAfter("haproxy-decoder", "haproxy-handler", new ProxyProtocolHandler());
+        } else if (isDirect) {
+            ProxyProtocolSupport.debugLogger.accept("Accepted direct connection from whitelisted IP: " + remoteIp);
+        } else {
+            ProxyProtocolSupport.warnLogger.accept("REJECTED unauthorized direct connection from: " + remoteIp);
+            channel.close();
+        }
+    }
+
+    private static boolean matchesAny(InetAddress address, Collection<CIDRMatcher> matchers) {
+        for (CIDRMatcher matcher : matchers) {
+            if (matcher.matches(address)) {
+                return true;
             }
         }
-
-        // 2. Check if the connection is from an IP allowed to connect directly.
-        // These connections are treated as regular Minecraft players.
-        for (CIDRMatcher matcher : ProxyProtocolSupport.directAccessIPs) {
-            if (matcher.matches(remoteIp)) {
-                ProxyProtocolSupport.debugLogger.accept("Accepted direct connection from whitelisted IP: " + remoteIp);
-                // Do nothing else; allow the connection to proceed normally.
-                return;
-            }
-        }
-
-        // 3. If the IP is in neither list, it's an unauthorized connection.
-        // This provides a "fail-closed" security model.
-        ProxyProtocolSupport.warnLogger.accept("REJECTED unauthorized direct connection from: " + remoteIp);
-        channel.close();
+        return false;
     }
 }

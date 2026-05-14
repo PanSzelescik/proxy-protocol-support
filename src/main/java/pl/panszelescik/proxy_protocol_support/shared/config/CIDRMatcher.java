@@ -1,5 +1,6 @@
 package pl.panszelescik.proxy_protocol_support.shared.config;
 
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -20,23 +21,20 @@ public class CIDRMatcher {
         String parsedIPAddress;
         if (split.length == 2) {
             parsedIPAddress = split[0];
-
             this.maskBits = Integer.parseInt(split[1]);
-            this.simpleCIDR = maskBits == 32;
         } else {
             parsedIPAddress = ipAddress;
-
             this.maskBits = -1;
-            this.simpleCIDR = true;
         }
-
-        this.maskBytes = simpleCIDR ? -1 : maskBits / 8;
 
         try {
             cidrAddress = InetAddress.getByName(parsedIPAddress);
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
+
+        this.simpleCIDR = maskBits == -1 || maskBits == (cidrAddress instanceof Inet6Address ? 128 : 32);
+        this.maskBytes = simpleCIDR ? -1 : maskBits / 8;
     }
 
     public boolean matches(InetAddress inetAddress) {
