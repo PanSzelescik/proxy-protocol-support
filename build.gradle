@@ -28,8 +28,8 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    implementation group: 'io.netty', name: 'netty-codec-haproxy', version: '4.2.10.Final'
-    include group: 'io.netty', name: 'netty-codec-haproxy', version: '4.2.10.Final'
+    implementation group: 'io.netty', name: 'netty-codec-haproxy', version: '4.2.13.Final'
+    include group: 'io.netty', name: 'netty-codec-haproxy', version: '4.2.13.Final'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
