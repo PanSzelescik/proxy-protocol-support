@@ -31,7 +31,7 @@ dependencies {
     implementation "io.netty:netty-codec-haproxy:4.2.15.Final"
     include "io.netty:netty-codec-haproxy:4.2.15.Final"
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:6.0.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.1.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
