@@ -51,8 +51,10 @@ public class ProxyProtocolDetector extends ChannelInboundHandlerAdapter {
 
         ByteBuf data = buffer;
         buffer = null;
-        ctx.fireChannelRead(data);
+        // Remove before forwarding: a later handler may rebuild the pipeline during channelRead (e.g. AutoModpack),
+        // which would make a subsequent remove(this) throw NoSuchElementException.
         ctx.pipeline().remove(this);
+        ctx.fireChannelRead(data);
     }
 
     @Override
