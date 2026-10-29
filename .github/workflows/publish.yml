@@ -21,7 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
       - name: Set up JDK 25
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: '25'
           distribution: 'temurin'
@@ -52,9 +52,9 @@ jobs:
           loaders: |
             fabric
           modrinth-game-versions: |
-            >=26.1
+            >=26.3
           curseforge-game-versions: |
-            >=26.1
+            >=26.3
           java: |
             >=25
 
